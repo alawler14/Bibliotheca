@@ -4,594 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bibliotheca - Book Release Tracker</title>
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-</head>
-<body>
-  <div id="root"></div>
-  
-  <script type="text/babel">
-    const { useState, useEffect } = React;
-    const { Calendar, Search, Book, Bell, Plus, X, Star, ExternalLink, Loader } = lucide;
-
-    // Backend API configuration
-    const API_BASE_URL = 'https://bibliotheca-6upz.onrender.com/api';
-
-    // Mock data for calendar view
-    const MOCK_BOOKS = [
-      {
-        id: 1,
-        title: "Dungeon Crawler Carl: Book 6",
-        author: "Matt Dinniman",
-        series: "Dungeon Crawler Carl",
-        releaseDate: "2026-03-15",
-        cover: "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=400&h=600&fit=crop",
-        description: "The next installment in the beloved LitRPG series"
-      },
-      {
-        id: 2,
-        title: "The Winds of Winter",
-        author: "George R.R. Martin",
-        series: "A Song of Ice and Fire",
-        releaseDate: "2026-11-20",
-        cover: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&h=600&fit=crop",
-        description: "The long-awaited sixth book"
-      },
-      {
-        id: 3,
-        title: "Doors of Stone",
-        author: "Patrick Rothfuss",
-        series: "The Kingkiller Chronicle",
-        releaseDate: "2026-09-08",
-        cover: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=600&fit=crop",
-        description: "The conclusion to the trilogy"
-      },
-      {
-        id: 4,
-        title: "Defiant",
-        author: "Brandon Sanderson",
-        series: "The Skyward Series",
-        releaseDate: "2026-02-28",
-        cover: "https://images.unsplash.com/photo-1589998059171-988d887df646?w=400&h=600&fit=crop",
-        description: "Book 4 of the Skyward series"
-      },
-      {
-        id: 5,
-        title: "Words of Radiance Remastered",
-        author: "Brandon Sanderson",
-        series: "The Stormlight Archive",
-        releaseDate: "2026-05-12",
-        cover: "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=400&h=600&fit=crop",
-        description: "10th anniversary edition with new content"
-      }
-    ];
-
-    const MOCK_AUTHORS = [
-      { id: 1, name: "Matt Dinniman", bookCount: 5 },
-      { id: 2, name: "Brandon Sanderson", bookCount: 45 },
-      { id: 3, name: "Patrick Rothfuss", bookCount: 2 },
-      { id: 4, name: "George R.R. Martin", bookCount: 12 }
-    ];
-
-    function BookTracker() {
-      const [view, setView] = useState('calendar');
-      const [followedBooks, setFollowedBooks] = useState([1, 4, 5]);
-      const [followedAuthors, setFollowedAuthors] = useState([1, 2]);
-      const [searchQuery, setSearchQuery] = useState('');
-      const [showAddModal, setShowAddModal] = useState(false);
-      const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
-      const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-      const [searchResults, setSearchResults] = useState([]);
-      const [isSearching, setIsSearching] = useState(false);
-      const [searchesRemaining, setSearchesRemaining] = useState(null);
-      const [searchError, setSearchError] = useState(null);
-
-      const searchGoogleBooks = async (query) => {
-        if (!query.trim()) return;
-        
-        setIsSearching(true);
-        setSearchError(null);
-        
-        try {
-          const response = await fetch(
-            `${API_BASE_URL}/books/search?query=${encodeURIComponent(query)}&maxResults=15`
-          );
-          
-          if (response.status === 429) {
-            const errorData = await response.json();
-            setSearchError(errorData.error || 'Daily search limit exceeded. Please try again tomorrow.');
-            setSearchResults([]);
-            setSearchesRemaining(0);
-            return;
-          }
-          
-          if (!response.ok) {
-            throw new Error('Failed to search books');
-          }
-          
-          const data = await response.json();
-          
-          const remaining = response.headers.get('X-Searches-Remaining');
-          if (remaining) {
-            setSearchesRemaining(parseInt(remaining));
-          }
-          
-          setSearchResults(data.books || []);
-        } catch (error) {
-          console.error('Error searching books:', error);
-          setSearchError('Failed to search books. Please check your connection and try again.');
-          setSearchResults([]);
-        } finally {
-          setIsSearching(false);
-        }
-      };
-
-      const handleSearchKeyPress = (e) => {
-        if (e.key === 'Enter') {
-          searchGoogleBooks(searchQuery);
-        }
-      };
-
-      useEffect(() => {
-        const checkRateLimit = async () => {
-          try {
-            const response = await fetch(`${API_BASE_URL}/rate-limit-status`);
-            if (response.ok) {
-              const data = await response.json();
-              setSearchesRemaining(data.remaining);
-            }
-          } catch (error) {
-            console.error('Error checking rate limit:', error);
-          }
-        };
-        
-        checkRateLimit();
-      }, []);
-
-      const getBooksByMonth = () => {
-        const booksByDate = {};
-        MOCK_BOOKS.filter(book => followedBooks.includes(book.id)).forEach(book => {
-          const date = new Date(book.releaseDate);
-          const key = `${date.getFullYear()}-${date.getMonth()}`;
-          if (!booksByDate[key]) booksByDate[key] = [];
-          booksByDate[key].push(book);
-        });
-        return booksByDate;
-      };
-
-      const monthNames = ["January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"];
-
-      const getDaysInMonth = (month, year) => {
-        return new Date(year, month + 1, 0).getDate();
-      };
-
-      const getFirstDayOfMonth = (month, year) => {
-        return new Date(year, month, 1).getDay();
-      };
-
-      const toggleFollowBook = (bookId) => {
-        setFollowedBooks(prev => 
-          prev.includes(bookId) ? prev.filter(id => id !== bookId) : [...prev, bookId]
-        );
-      };
-
-      const toggleFollowAuthor = (authorId) => {
-        setFollowedAuthors(prev =>
-          prev.includes(authorId) ? prev.filter(id => id !== authorId) : [...prev, authorId]
-        );
-      };
-
-      const getReleasesForDate = (day) => {
-        const dateStr = `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        return MOCK_BOOKS.filter(book => 
-          followedBooks.includes(book.id) && book.releaseDate === dateStr
-        );
-      };
-
-      const upcomingBooks = MOCK_BOOKS
-        .filter(book => followedBooks.includes(book.id))
-        .sort((a, b) => new Date(a.releaseDate) - new Date(b.releaseDate));
-
-      return React.createElement('div', {
-        style: {
-          minHeight: '100vh',
-          background: 'linear-gradient(135deg, #faf8f3 0%, #f5f0e8 50%, #faf8f3 100%)',
-          fontFamily: '"Cormorant Garamond", "Crimson Text", Georgia, serif',
-          color: '#2d1810',
-          padding: '0',
-          position: 'relative',
-          overflow: 'hidden'
-        }
-      },
-        // Background decoration
-        React.createElement('div', {
-          style: {
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: `
-              radial-gradient(circle at 20% 30%, rgba(139, 90, 43, 0.03) 0%, transparent 50%),
-              radial-gradient(circle at 80% 70%, rgba(160, 82, 45, 0.03) 0%, transparent 50%)
-            `,
-            pointerEvents: 'none',
-            zIndex: 0
-          }
-        }),
-        
-        // Main container
-        React.createElement('div', { style: { position: 'relative', zIndex: 1, maxWidth: '1400px', margin: '0 auto', padding: '40px 20px' }},
-          // Header
-          React.createElement('header', { style: { marginBottom: '60px', textAlign: 'center' }},
-            React.createElement('div', {
-              style: {
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '20px',
-                marginBottom: '20px',
-                padding: '20px 40px',
-                background: 'rgba(255, 255, 255, 0.8)',
-                borderRadius: '60px',
-                border: '2px solid rgba(139, 90, 43, 0.2)',
-                backdropFilter: 'blur(10px)',
-                boxShadow: '0 4px 20px rgba(139, 90, 43, 0.1)'
-              }
-            },
-              React.createElement(Book, { size: 40, color: "#8b5a2b", strokeWidth: 1.5 }),
-              React.createElement('h1', {
-                style: {
-                  margin: 0,
-                  fontSize: '3.5rem',
-                  fontWeight: 400,
-                  letterSpacing: '0.05em',
-                  background: 'linear-gradient(135deg, #8b5a2b 0%, #6b4423 50%, #8b5a2b 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  fontVariant: 'small-caps'
-                }
-              }, 'Bibliotheca')
-            ),
-            React.createElement('p', {
-              style: {
-                fontSize: '1.2rem',
-                color: '#6b4423',
-                margin: '0',
-                fontStyle: 'italic',
-                letterSpacing: '0.1em'
-              }
-            }, 'Your Personal Literary Chronicle')
-          ),
-          
-          // Navigation
-          React.createElement('div', {
-            style: {
-              display: 'flex',
-              justifyContent: 'center',
-              gap: '15px',
-              marginBottom: '50px',
-              flexWrap: 'wrap'
-            }
-          },
-            [
-              { id: 'calendar', label: 'Calendar', icon: Calendar },
-              { id: 'list', label: 'Upcoming', icon: Bell },
-              { id: 'following', label: 'Following', icon: Star }
-            ].map(({ id, label, icon: Icon }) =>
-              React.createElement('button', {
-                key: id,
-                onClick: () => setView(id),
-                style: {
-                  padding: '14px 32px',
-                  background: view === id ? 'rgba(139, 90, 43, 0.15)' : 'rgba(255, 255, 255, 0.7)',
-                  border: view === id ? '2px solid rgba(139, 90, 43, 0.5)' : '2px solid rgba(139, 90, 43, 0.2)',
-                  borderRadius: '30px',
-                  color: view === id ? '#6b4423' : '#8b5a2b',
-                  fontSize: '1.1rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  transition: 'all 0.3s ease',
-                  fontFamily: 'inherit',
-                  letterSpacing: '0.05em',
-                  backdropFilter: 'blur(5px)',
-                  boxShadow: view === id ? '0 2px 10px rgba(139, 90, 43, 0.15)' : '0 2px 8px rgba(0, 0, 0, 0.05)'
-                }
-              },
-                React.createElement(Icon, { size: 18 }),
-                label
-              )
-            ),
-            React.createElement('button', {
-              onClick: () => setShowAddModal(true),
-              style: {
-                padding: '14px 32px',
-                background: 'rgba(139, 90, 43, 0.9)',
-                border: '2px solid rgba(139, 90, 43, 1)',
-                borderRadius: '30px',
-                color: '#faf8f3',
-                fontSize: '1.1rem',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                transition: 'all 0.3s ease',
-                fontFamily: 'inherit',
-                letterSpacing: '0.05em',
-                boxShadow: '0 2px 10px rgba(139, 90, 43, 0.2)'
-              }
-            },
-              React.createElement(Plus, { size: 18 }),
-              'Add Book'
-            )
-          ),
-
-          // Content views would go here - simplified for deployment
-          React.createElement('div', {
-            style: {
-              background: 'rgba(255, 255, 255, 0.7)',
-              padding: '40px',
-              borderRadius: '20px',
-              border: '2px solid rgba(139, 90, 43, 0.2)',
-              textAlign: 'center'
-            }
-          },
-            React.createElement('h2', {
-              style: { color: '#6b4423', marginBottom: '20px', fontSize: '2rem' }
-            }, 'Welcome to Bibliotheca!'),
-            React.createElement('p', {
-              style: { color: '#8b5a2b', fontSize: '1.2rem', marginBottom: '30px' }
-            }, 'Click "Add Book" to search for books and start tracking releases.'),
-            React.createElement('p', {
-              style: { color: '#a08060', fontSize: '1rem' }
-            }, `You have ${searchesRemaining !== null ? searchesRemaining : '...'} searches remaining today.`)
-          )
-        ),
-
-        // Add Book Modal
-        showAddModal && React.createElement('div', {
-          style: {
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0, 0, 0, 0.6)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000,
-            padding: '20px'
-          }
-        },
-          React.createElement('div', {
-            style: {
-              background: 'linear-gradient(135deg, #faf8f3 0%, #f5f0e8 100%)',
-              borderRadius: '20px',
-              padding: '40px',
-              maxWidth: '800px',
-              width: '100%',
-              maxHeight: '90vh',
-              overflow: 'auto',
-              border: '2px solid rgba(139, 90, 43, 0.3)',
-              position: 'relative',
-              backdropFilter: 'blur(20px)',
-              boxShadow: '0 10px 40px rgba(0, 0, 0, 0.2)'
-            }
-          },
-            React.createElement('button', {
-              onClick: () => {
-                setShowAddModal(false);
-                setSearchResults([]);
-                setSearchQuery('');
-                setSearchError(null);
-              },
-              style: {
-                position: 'absolute',
-                top: '20px',
-                right: '20px',
-                background: 'none',
-                border: 'none',
-                color: '#8b5a2b',
-                cursor: 'pointer',
-                padding: '5px'
-              }
-            }, React.createElement(X, { size: 24 })),
-            
-            React.createElement('h2', {
-              style: {
-                fontSize: '2rem',
-                marginBottom: '30px',
-                fontWeight: 400,
-                letterSpacing: '0.1em',
-                textAlign: 'center',
-                fontVariant: 'small-caps',
-                color: '#6b4423'
-              }
-            }, 'Add New Book'),
-
-            searchesRemaining !== null && React.createElement('div', {
-              style: {
-                background: searchesRemaining > 10 ? 'rgba(139, 90, 43, 0.08)' : 'rgba(220, 100, 50, 0.12)',
-                padding: '12px 16px',
-                borderRadius: '8px',
-                marginBottom: '20px',
-                fontSize: '0.85rem',
-                color: searchesRemaining > 10 ? '#6b4423' : '#a04020',
-                border: `1px solid ${searchesRemaining > 10 ? 'rgba(139, 90, 43, 0.2)' : 'rgba(220, 100, 50, 0.3)'}`
-              }
-            }, searchesRemaining > 0 ? `${searchesRemaining} searches remaining today` : '⚠️ Daily limit reached - try again tomorrow'),
-            
-            React.createElement('div', { style: { marginBottom: '25px' }},
-              React.createElement('label', {
-                style: {
-                  display: 'block',
-                  marginBottom: '10px',
-                  fontSize: '1rem',
-                  color: '#6b4423',
-                  letterSpacing: '0.05em'
-                }
-              }, 'Search for a book'),
-              React.createElement('div', { style: { display: 'flex', gap: '10px' }},
-                React.createElement('input', {
-                  type: 'text',
-                  placeholder: 'e.g., Dungeon Crawler Carl, Brandon Sanderson...',
-                  value: searchQuery,
-                  onChange: (e) => setSearchQuery(e.target.value),
-                  onKeyPress: handleSearchKeyPress,
-                  disabled: searchesRemaining === 0,
-                  style: {
-                    flex: 1,
-                    padding: '15px 20px',
-                    background: searchesRemaining === 0 ? 'rgba(200, 200, 200, 0.3)' : 'rgba(255, 255, 255, 0.8)',
-                    border: '2px solid rgba(139, 90, 43, 0.25)',
-                    borderRadius: '12px',
-                    color: '#2d1810',
-                    fontSize: '1rem',
-                    fontFamily: 'inherit',
-                    outline: 'none',
-                    cursor: searchesRemaining === 0 ? 'not-allowed' : 'text'
-                  }
-                }),
-                React.createElement('button', {
-                  onClick: () => searchGoogleBooks(searchQuery),
-                  disabled: isSearching || searchesRemaining === 0,
-                  style: {
-                    padding: '15px 25px',
-                    background: (isSearching || searchesRemaining === 0) ? 'rgba(139, 90, 43, 0.5)' : 'rgba(139, 90, 43, 0.9)',
-                    border: 'none',
-                    borderRadius: '12px',
-                    color: '#faf8f3',
-                    cursor: (isSearching || searchesRemaining === 0) ? 'not-allowed' : 'pointer',
-                    fontSize: '1rem',
-                    fontFamily: 'inherit',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px'
-                  }
-                },
-                  isSearching ? React.createElement(Loader, { size: 18, className: 'spin' }) : React.createElement(Search, { size: 18 }),
-                  isSearching ? 'Searching...' : 'Search'
-                )
-              )
-            ),
-
-            searchError && React.createElement('div', {
-              style: {
-                background: 'rgba(220, 100, 50, 0.12)',
-                padding: '15px',
-                borderRadius: '8px',
-                marginBottom: '20px',
-                fontSize: '0.9rem',
-                color: '#a04020',
-                border: '1px solid rgba(220, 100, 50, 0.3)'
-              }
-            }, searchError),
-
-            searchResults.length > 0 && React.createElement('div', { style: { marginTop: '25px' }},
-              React.createElement('h3', {
-                style: {
-                  fontSize: '1.2rem',
-                  marginBottom: '15px',
-                  color: '#6b4423',
-                  fontWeight: 400
-                }
-              }, 'Search Results'),
-              React.createElement('div', {
-                style: {
-                  maxHeight: '400px',
-                  overflowY: 'auto',
-                  display: 'grid',
-                  gap: '12px'
-                }
-              },
-                searchResults.map(book =>
-                  React.createElement('div', {
-                    key: book.id,
-                    style: {
-                      background: 'rgba(255, 255, 255, 0.7)',
-                      padding: '15px',
-                      borderRadius: '12px',
-                      border: '1px solid rgba(139, 90, 43, 0.2)',
-                      display: 'flex',
-                      gap: '15px'
-                    }
-                  },
-                    book.cover && React.createElement('img', {
-                      src: book.cover,
-                      alt: book.title,
-                      style: {
-                        width: '60px',
-                        height: '90px',
-                        objectFit: 'cover',
-                        borderRadius: '6px',
-                        border: '1px solid rgba(139, 90, 43, 0.2)'
-                      }
-                    }),
-                    React.createElement('div', { style: { flex: 1 }},
-                      React.createElement('h4', {
-                        style: {
-                          fontSize: '1.1rem',
-                          margin: '0 0 4px 0',
-                          color: '#2d1810'
-                        }
-                      }, book.title),
-                      React.createElement('p', {
-                        style: {
-                          fontSize: '0.9rem',
-                          margin: '0 0 8px 0',
-                          color: '#6b4423',
-                          fontStyle: 'italic'
-                        }
-                      }, `by ${book.author}`),
-                      React.createElement('p', {
-                        style: {
-                          fontSize: '0.8rem',
-                          margin: '0',
-                          color: '#8b5a2b',
-                          lineHeight: '1.4'
-                        }
-                      }, book.description),
-                      book.publishedDate && React.createElement('p', {
-                        style: {
-                          fontSize: '0.75rem',
-                          margin: '8px 0 0 0',
-                          color: '#a08060'
-                        }
-                      }, `Published: ${book.publishedDate}`)
-                    ),
-                    React.createElement('button', {
-                      onClick: () => alert(`Feature coming soon! This would add "${book.title}" to your tracking list.`),
-                      style: {
-                        padding: '8px 16px',
-                        background: 'rgba(139, 90, 43, 0.15)',
-                        border: '1px solid rgba(139, 90, 43, 0.3)',
-                        borderRadius: '8px',
-                        color: '#6b4423',
-                        cursor: 'pointer',
-                        fontSize: '0.85rem',
-                        fontFamily: 'inherit',
-                        height: 'fit-content'
-                      }
-                    }, '+ Track')
-                  )
-                )
-              )
-            )
-          )
-        )
-      );
-    }
-
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(React.createElement(BookTracker));
-  </script>
-
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -600,18 +13,405 @@
     }
 
     body {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      background: linear-gradient(135deg, #faf8f3 0%, #f5f0e8 50%, #faf8f3 100%);
+      min-height: 100vh;
+      color: #2d1810;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .logo-container {
+      display: inline-flex;
+      align-items: center;
+      gap: 20px;
+      padding: 20px 40px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 60px;
+      border: 2px solid rgba(139, 90, 43, 0.2);
+      box-shadow: 0 4px 20px rgba(139, 90, 43, 0.1);
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      background: linear-gradient(135deg, #8b5a2b 0%, #6b4423 50%, #8b5a2b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-variant: small-caps;
       margin: 0;
-      padding: 0;
+    }
+
+    .tagline {
+      font-size: 1.2rem;
+      color: #6b4423;
+      font-style: italic;
+      letter-spacing: 0.1em;
+    }
+
+    .search-section {
+      background: rgba(255, 255, 255, 0.7);
+      padding: 30px;
+      border-radius: 20px;
+      border: 2px solid rgba(139, 90, 43, 0.2);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      margin-bottom: 30px;
+    }
+
+    .rate-limit-badge {
+      background: rgba(139, 90, 43, 0.08);
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      color: #6b4423;
+      border: 1px solid rgba(139, 90, 43, 0.2);
+      text-align: center;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 15px 20px;
+      font-size: 1.1rem;
+      border: 2px solid rgba(139, 90, 43, 0.25);
+      border-radius: 12px;
+      font-family: inherit;
+      background: rgba(255, 255, 255, 0.8);
+      color: #2d1810;
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: rgba(139, 90, 43, 0.5);
+    }
+
+    input[type="text"]:disabled {
+      background: rgba(200, 200, 200, 0.3);
+      cursor: not-allowed;
+    }
+
+    button {
+      padding: 15px 30px;
+      font-size: 1.1rem;
+      background: rgba(139, 90, 43, 0.9);
+      color: #faf8f3;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: 0.05em;
+      transition: all 0.3s ease;
+    }
+
+    button:hover:not(:disabled) {
+      background: rgba(107, 68, 35, 0.9);
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      background: rgba(139, 90, 43, 0.5);
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .results {
+      display: grid;
+      gap: 15px;
+    }
+
+    .book-card {
+      background: rgba(255, 255, 255, 0.7);
+      padding: 20px;
+      border-radius: 12px;
+      border: 2px solid rgba(139, 90, 43, 0.2);
+      display: flex;
+      gap: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .book-card:hover {
+      border-color: rgba(139, 90, 43, 0.5);
+      box-shadow: 0 4px 25px rgba(139, 90, 43, 0.15);
+    }
+
+    .book-cover {
+      width: 120px;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 2px solid rgba(139, 90, 43, 0.25);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .book-info {
+      flex: 1;
+    }
+
+    .book-title {
+      font-size: 1.6rem;
+      margin-bottom: 8px;
+      color: #2d1810;
+      font-weight: 500;
+    }
+
+    .book-author {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+      color: #8b5a2b;
+      font-style: italic;
+    }
+
+    .book-description {
+      font-size: 0.95rem;
+      color: #5a4030;
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+
+    .book-meta {
+      font-size: 0.85rem;
+      color: #a08060;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      font-size: 1.2rem;
+      color: #8b5a2b;
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 40px;
+      font-size: 1.1rem;
+      color: #6b4423;
+      font-style: italic;
+    }
+
+    .error-message {
+      background: rgba(220, 100, 50, 0.12);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      color: #a04020;
+      border: 1px solid rgba(220, 100, 50, 0.3);
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #faf8f3;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 8px;
     }
 
     @keyframes spin {
-      from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
     }
 
-    .spin {
-      animation: spin 1s linear infinite;
+    .info-box {
+      background: rgba(139, 90, 43, 0.08);
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(139, 90, 43, 0.2);
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: #5a4030;
+      line-height: 1.6;
     }
   </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="logo-container">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#8b5a2b" stroke-width="1.5">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+        </svg>
+        <h1>Bibliotheca</h1>
+      </div>
+      <p class="tagline">Your Personal Literary Chronicle</p>
+    </header>
+
+    <div class="search-section">
+      <h2 style="margin-bottom: 20px; color: #6b4423; font-weight: 400; letter-spacing: 0.08em; font-variant: small-caps;">Search for Books</h2>
+      
+      <div id="rateLimitBadge" class="rate-limit-badge">
+        Checking search limit...
+      </div>
+      
+      <div class="search-box">
+        <input 
+          type="text" 
+          id="searchInput" 
+          placeholder="Search by title, author, or ISBN..."
+          onkeypress="if(event.key==='Enter') searchBooks()"
+        >
+        <button onclick="searchBooks()" id="searchBtn">Search</button>
+      </div>
+
+      <div id="errorMessage" style="display: none;" class="error-message"></div>
+      <div id="results"></div>
+
+      <div class="info-box">
+        <strong>🔒 Protected API</strong><br>
+        Your searches are powered by a secure backend that limits usage to 50 searches per day per user. 
+        This protects the API from abuse while keeping the service free for everyone.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE_URL = 'https://bibliotheca-6upz.onrender.com/api';
+    let searchesRemaining = null;
+
+    // Check rate limit on page load
+    async function checkRateLimit() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/rate-limit-status`);
+        if (response.ok) {
+          const data = await response.json();
+          searchesRemaining = data.remaining;
+          updateRateLimitBadge();
+        }
+      } catch (error) {
+        console.error('Error checking rate limit:', error);
+        document.getElementById('rateLimitBadge').textContent = 'Unable to check search limit';
+      }
+    }
+
+    function updateRateLimitBadge() {
+      const badge = document.getElementById('rateLimitBadge');
+      if (searchesRemaining !== null) {
+        if (searchesRemaining > 0) {
+          badge.textContent = `${searchesRemaining} searches remaining today`;
+          badge.style.background = 'rgba(139, 90, 43, 0.08)';
+          badge.style.color = '#6b4423';
+        } else {
+          badge.textContent = '⚠️ Daily limit reached - try again tomorrow';
+          badge.style.background = 'rgba(220, 100, 50, 0.12)';
+          badge.style.color = '#a04020';
+        }
+      }
+    }
+
+    async function searchBooks() {
+      const query = document.getElementById('searchInput').value.trim();
+      const resultsDiv = document.getElementById('results');
+      const searchBtn = document.getElementById('searchBtn');
+      const errorDiv = document.getElementById('errorMessage');
+      const searchInput = document.getElementById('searchInput');
+
+      if (!query) {
+        errorDiv.textContent = 'Please enter a search term';
+        errorDiv.style.display = 'block';
+        return;
+      }
+
+      if (searchesRemaining === 0) {
+        errorDiv.textContent = 'Daily search limit reached. Please try again tomorrow.';
+        errorDiv.style.display = 'block';
+        return;
+      }
+
+      // Show loading state
+      searchBtn.disabled = true;
+      searchInput.disabled = true;
+      searchBtn.innerHTML = '<span class="spinner"></span>Searching...';
+      resultsDiv.innerHTML = '<div class="loading">Searching for books...</div>';
+      errorDiv.style.display = 'none';
+
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/books/search?query=${encodeURIComponent(query)}&maxResults=20`
+        );
+
+        if (response.status === 429) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Daily search limit exceeded');
+        }
+
+        if (!response.ok) {
+          throw new Error(`API Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Update remaining searches
+        const remaining = response.headers.get('X-Searches-Remaining');
+        if (remaining) {
+          searchesRemaining = parseInt(remaining);
+          updateRateLimitBadge();
+        }
+
+        if (!data.books || data.books.length === 0) {
+          resultsDiv.innerHTML = '<div class="no-results">No results found. Try a different search term.</div>';
+          return;
+        }
+
+        // Display results
+        const booksHTML = data.books.map(book => {
+          const title = book.title || 'Unknown Title';
+          const authors = book.author || 'Unknown Author';
+          const description = book.description || 'No description available';
+          const cover = book.cover || '';
+          const publishedDate = book.publishedDate || 'Unknown';
+          const pageCount = book.pageCount || 'Unknown';
+
+          return `
+            <div class="book-card">
+              ${cover ? `<img src="${cover}" alt="${title}" class="book-cover">` : ''}
+              <div class="book-info">
+                <h3 class="book-title">${title}</h3>
+                <p class="book-author">by ${authors}</p>
+                <p class="book-description">${description}</p>
+                <p class="book-meta">Published: ${publishedDate} • ${pageCount} pages</p>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        resultsDiv.innerHTML = booksHTML;
+
+      } catch (error) {
+        console.error('Search error:', error);
+        errorDiv.textContent = error.message;
+        errorDiv.style.display = 'block';
+        resultsDiv.innerHTML = '';
+      } finally {
+        searchBtn.disabled = searchesRemaining === 0;
+        searchInput.disabled = searchesRemaining === 0;
+        searchBtn.textContent = 'Search';
+      }
+    }
+
+    // Initialize on page load
+    window.addEventListener('load', () => {
+      document.getElementById('searchInput').focus();
+      checkRateLimit();
+    });
+  </script>
 </body>
 </html>
