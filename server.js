@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
-const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -10,11 +9,6 @@ const PORT = process.env.PORT || 3001;
 // Middleware
 app.use(cors());
 app.use(express.json());
-
-// Serve static files in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, 'public')));
-}
 
 // Google Books API configuration
 const GOOGLE_BOOKS_API_KEY = process.env.GOOGLE_BOOKS_API_KEY || 'AIzaSyB_DDn21AYWrztDH2U8dJvYmfAC1aDx9Bk';
@@ -213,25 +207,12 @@ app.get('/api/rate-limit-status', searchLimiter, (req, res) => {
   });
 });
 
-// Serve static files in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static('public'));
-  
-  // Catch-all handler for React Router (after all API routes)
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-  });
-}
-
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📚 Google Books API proxy ready`);
   console.log(`🛡️  Rate limit: 50 searches per IP per day`);
   console.log(`💾 Caching enabled (1 hour TTL)`);
-  if (process.env.NODE_ENV === 'production') {
-    console.log(`🌐 Serving static files from /public`);
-  }
 });
 
 // Cleanup old cache entries every hour
