@@ -27,7 +27,7 @@
 
     .header {
       text-align: center;
-      margin-bottom: 60px;
+      margin-bottom: 40px;
     }
 
     .logo-container {
@@ -60,6 +60,39 @@
       letter-spacing: 0.1em;
     }
 
+    .nav-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      padding: 14px 32px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 2px solid rgba(139, 90, 43, 0.2);
+      border-radius: 30px;
+      color: #8b5a2b;
+      font-size: 1.1rem;
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: 0.05em;
+      transition: all 0.3s ease;
+    }
+
+    .nav-btn:hover {
+      background: rgba(139, 90, 43, 0.1);
+      border-color: rgba(139, 90, 43, 0.35);
+    }
+
+    .nav-btn.active {
+      background: rgba(139, 90, 43, 0.15);
+      border-color: rgba(139, 90, 43, 0.5);
+      color: #6b4423;
+      box-shadow: 0 2px 10px rgba(139, 90, 43, 0.15);
+    }
+
     .search-section {
       background: rgba(255, 255, 255, 0.7);
       padding: 30px;
@@ -80,10 +113,36 @@
       text-align: center;
     }
 
+    .search-type-toggle {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      justify-content: center;
+    }
+
+    .toggle-btn {
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 2px solid rgba(139, 90, 43, 0.2);
+      border-radius: 20px;
+      color: #8b5a2b;
+      font-size: 0.95rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.3s ease;
+    }
+
+    .toggle-btn.active {
+      background: rgba(139, 90, 43, 0.2);
+      border-color: rgba(139, 90, 43, 0.5);
+      color: #6b4423;
+    }
+
     .search-box {
       display: flex;
       gap: 10px;
       margin-bottom: 20px;
+      position: relative;
     }
 
     input[type="text"] {
@@ -107,7 +166,7 @@
       cursor: not-allowed;
     }
 
-    button {
+    .btn-primary {
       padding: 15px 30px;
       font-size: 1.1rem;
       background: rgba(139, 90, 43, 0.9);
@@ -120,15 +179,31 @@
       transition: all 0.3s ease;
     }
 
-    button:hover:not(:disabled) {
+    .btn-primary:hover:not(:disabled) {
       background: rgba(107, 68, 35, 0.9);
       transform: translateY(-1px);
     }
 
-    button:disabled {
+    .btn-primary:disabled {
       background: rgba(139, 90, 43, 0.5);
       cursor: not-allowed;
       transform: none;
+    }
+
+    .btn-secondary {
+      padding: 8px 16px;
+      background: rgba(139, 90, 43, 0.15);
+      border: 1px solid rgba(139, 90, 43, 0.3);
+      border-radius: 8px;
+      color: #6b4423;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(139, 90, 43, 0.25);
     }
 
     .results {
@@ -182,12 +257,19 @@
       font-size: 0.95rem;
       color: #5a4030;
       line-height: 1.6;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
     }
 
     .book-meta {
       font-size: 0.85rem;
       color: #a08060;
+      margin-bottom: 15px;
+    }
+
+    .book-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
     .loading {
@@ -230,15 +312,91 @@
       to { transform: rotate(360deg); }
     }
 
-    .info-box {
-      background: rgba(139, 90, 43, 0.08);
-      padding: 20px;
+    .tracked-books {
+      display: grid;
+      gap: 15px;
+    }
+
+    .tracked-item {
+      background: rgba(255, 255, 255, 0.7);
+      padding: 15px 20px;
       border-radius: 12px;
-      border: 1px solid rgba(139, 90, 43, 0.2);
-      margin-top: 20px;
+      border: 2px solid rgba(139, 90, 43, 0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .calendar-grid {
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 20px;
+      padding: 30px;
+      border: 2px solid rgba(139, 90, 43, 0.15);
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 15px 20px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 12px;
+    }
+
+    .calendar-nav-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #8b5a2b;
+      cursor: pointer;
+      padding: 5px 15px;
+    }
+
+    .calendar-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .day-header {
+      text-align: center;
       font-size: 0.9rem;
-      color: #5a4030;
-      line-height: 1.6;
+      font-weight: 600;
+      color: #6b4423;
+      padding: 10px;
+      font-variant: small-caps;
+    }
+
+    .day-cell {
+      min-height: 100px;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(139, 90, 43, 0.15);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: #6b4423;
+    }
+
+    .day-cell.has-release {
+      background: rgba(139, 90, 43, 0.1);
+      border-color: rgba(139, 90, 43, 0.3);
+    }
+
+    .release-badge {
+      background: rgba(139, 90, 43, 0.8);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      margin-top: 4px;
+      display: block;
+      cursor: pointer;
+    }
+
+    .release-badge:hover {
+      background: rgba(107, 68, 35, 0.9);
     }
   </style>
 </head>
@@ -255,30 +413,84 @@
       <p class="tagline">Your Personal Literary Chronicle</p>
     </header>
 
-    <div class="search-section">
-      <h2 style="margin-bottom: 20px; color: #6b4423; font-weight: 400; letter-spacing: 0.08em; font-variant: small-caps;">Search for Books</h2>
+    <!-- Navigation -->
+    <div class="nav-buttons">
+      <button class="nav-btn active" onclick="showView('search')" id="navSearch">
+        🔍 Search
+      </button>
+      <button class="nav-btn" onclick="showView('calendar')" id="navCalendar">
+        📅 Calendar
+      </button>
+      <button class="nav-btn" onclick="showView('tracked')" id="navTracked">
+        ⭐ My Books (<span id="trackedCount">0</span>)
+      </button>
+    </div>
+
+    <!-- Search View -->
+    <div id="searchView" class="search-section">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="color: #6b4423; font-weight: 400; letter-spacing: 0.08em; font-variant: small-caps; margin: 0;">Search for Books</h2>
+        <button class="btn-secondary" onclick="clearSearch()" id="homeBtn" style="display: none;">
+          🏠 Clear Search
+        </button>
+      </div>
       
       <div id="rateLimitBadge" class="rate-limit-badge">
         Checking search limit...
+      </div>
+
+      <!-- Search Type Toggle -->
+      <div class="search-type-toggle">
+        <button class="toggle-btn active" onclick="setSearchType('title')" id="toggleTitle">
+          📚 Search by Title
+        </button>
+        <button class="toggle-btn" onclick="setSearchType('author')" id="toggleAuthor">
+          ✍️ Search by Author
+        </button>
       </div>
       
       <div class="search-box">
         <input 
           type="text" 
           id="searchInput" 
-          placeholder="Search by title, author, or ISBN..."
+          placeholder="Enter search term and press Enter or click Search..."
           onkeypress="if(event.key==='Enter') searchBooks()"
         >
-        <button onclick="searchBooks()" id="searchBtn">Search</button>
+        <button class="btn-primary" onclick="searchBooks()" id="searchBtn">Search</button>
       </div>
 
       <div id="errorMessage" style="display: none;" class="error-message"></div>
       <div id="results"></div>
+    </div>
 
-      <div class="info-box">
-        <strong>🔒 Protected API</strong><br>
-        Your searches are powered by a secure backend that limits usage to 50 searches per day per user. 
-        This protects the API from abuse while keeping the service free for everyone.
+    <!-- Calendar View -->
+    <div id="calendarView" style="display: none;">
+      <div class="calendar-grid">
+        <div class="calendar-header">
+          <button class="calendar-nav-btn" onclick="changeMonth(-1)">‹</button>
+          <h2 id="calendarMonth" style="color: #6b4423; font-weight: 400; font-variant: small-caps;">January 2026</h2>
+          <button class="calendar-nav-btn" onclick="changeMonth(1)">›</button>
+        </div>
+        
+        <div class="calendar-days">
+          <div class="day-header">Sun</div>
+          <div class="day-header">Mon</div>
+          <div class="day-header">Tue</div>
+          <div class="day-header">Wed</div>
+          <div class="day-header">Thu</div>
+          <div class="day-header">Fri</div>
+          <div class="day-header">Sat</div>
+        </div>
+
+        <div id="calendarDays" class="calendar-days"></div>
+      </div>
+    </div>
+
+    <!-- Tracked Books View -->
+    <div id="trackedView" style="display: none;">
+      <div class="search-section">
+        <h2 style="margin-bottom: 20px; color: #6b4423; font-weight: 400; letter-spacing: 0.08em; font-variant: small-caps;">My Tracked Books & Authors</h2>
+        <div id="trackedList" class="tracked-books"></div>
       </div>
     </div>
   </div>
@@ -286,8 +498,63 @@
   <script>
     const API_BASE_URL = 'https://bibliotheca-6upz.onrender.com/api';
     let searchesRemaining = null;
+    let searchType = 'title';
+    let trackedBooks = JSON.parse(localStorage.getItem('trackedBooks') || '[]');
+    let trackedAuthors = JSON.parse(localStorage.getItem('trackedAuthors') || '[]');
+    let currentMonth = new Date().getMonth();
+    let currentYear = new Date().getFullYear();
 
-    // Check rate limit on page load
+    // Initialize
+    window.addEventListener('load', () => {
+      checkRateLimit();
+      updateTrackedCount();
+      renderCalendar();
+    });
+
+    function showView(view) {
+      // Hide all views
+      document.getElementById('searchView').style.display = 'none';
+      document.getElementById('calendarView').style.display = 'none';
+      document.getElementById('trackedView').style.display = 'none';
+
+      // Remove active class from all nav buttons
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+
+      // Show selected view
+      if (view === 'search') {
+        document.getElementById('searchView').style.display = 'block';
+        document.getElementById('navSearch').classList.add('active');
+      } else if (view === 'calendar') {
+        document.getElementById('calendarView').style.display = 'block';
+        document.getElementById('navCalendar').classList.add('active');
+        renderCalendar();
+      } else if (view === 'tracked') {
+        document.getElementById('trackedView').style.display = 'block';
+        document.getElementById('navTracked').classList.add('active');
+        renderTrackedBooks();
+      }
+    }
+
+    function setSearchType(type) {
+      searchType = type;
+      document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+      
+      if (type === 'title') {
+        document.getElementById('toggleTitle').classList.add('active');
+        document.getElementById('searchInput').placeholder = 'Start typing a book title...';
+      } else {
+        document.getElementById('toggleAuthor').classList.add('active');
+        document.getElementById('searchInput').placeholder = 'Start typing an author name...';
+      }
+    }
+
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('results').innerHTML = '';
+      document.getElementById('homeBtn').style.display = 'none';
+      document.getElementById('errorMessage').style.display = 'none';
+    }
+
     async function checkRateLimit() {
       try {
         const response = await fetch(`${API_BASE_URL}/rate-limit-status`);
@@ -323,6 +590,7 @@
       const searchBtn = document.getElementById('searchBtn');
       const errorDiv = document.getElementById('errorMessage');
       const searchInput = document.getElementById('searchInput');
+      const homeBtn = document.getElementById('homeBtn');
 
       if (!query) {
         errorDiv.textContent = 'Please enter a search term';
@@ -338,14 +606,17 @@
 
       // Show loading state
       searchBtn.disabled = true;
-      searchInput.disabled = true;
       searchBtn.innerHTML = '<span class="spinner"></span>Searching...';
       resultsDiv.innerHTML = '<div class="loading">Searching for books...</div>';
       errorDiv.style.display = 'none';
+      homeBtn.style.display = 'inline-block';
 
       try {
+        // Adjust query based on search type
+        const searchQuery = searchType === 'author' ? `inauthor:${query}` : query;
+        
         const response = await fetch(
-          `${API_BASE_URL}/books/search?query=${encodeURIComponent(query)}&maxResults=20`
+          `${API_BASE_URL}/books/search?query=${encodeURIComponent(searchQuery)}&maxResults=20`
         );
 
         if (response.status === 429) {
@@ -359,7 +630,6 @@
 
         const data = await response.json();
 
-        // Update remaining searches
         const remaining = response.headers.get('X-Searches-Remaining');
         if (remaining) {
           searchesRemaining = parseInt(remaining);
@@ -371,29 +641,7 @@
           return;
         }
 
-        // Display results
-        const booksHTML = data.books.map(book => {
-          const title = book.title || 'Unknown Title';
-          const authors = book.author || 'Unknown Author';
-          const description = book.description || 'No description available';
-          const cover = book.cover || '';
-          const publishedDate = book.publishedDate || 'Unknown';
-          const pageCount = book.pageCount || 'Unknown';
-
-          return `
-            <div class="book-card">
-              ${cover ? `<img src="${cover}" alt="${title}" class="book-cover">` : ''}
-              <div class="book-info">
-                <h3 class="book-title">${title}</h3>
-                <p class="book-author">by ${authors}</p>
-                <p class="book-description">${description}</p>
-                <p class="book-meta">Published: ${publishedDate} • ${pageCount} pages</p>
-              </div>
-            </div>
-          `;
-        }).join('');
-
-        resultsDiv.innerHTML = booksHTML;
+        displayResults(data.books);
 
       } catch (error) {
         console.error('Search error:', error);
@@ -402,16 +650,190 @@
         resultsDiv.innerHTML = '';
       } finally {
         searchBtn.disabled = searchesRemaining === 0;
-        searchInput.disabled = searchesRemaining === 0;
         searchBtn.textContent = 'Search';
       }
     }
 
-    // Initialize on page load
-    window.addEventListener('load', () => {
-      document.getElementById('searchInput').focus();
-      checkRateLimit();
-    });
+    function displayResults(books) {
+      const resultsDiv = document.getElementById('results');
+      
+      const booksHTML = books.map(book => {
+        const title = book.title || 'Unknown Title';
+        const authors = book.authors ? book.authors.join(', ') : (book.author || 'Unknown Author');
+        const description = book.description || 'No description available';
+        const cover = book.cover || '';
+        const publishedDate = book.publishedDate || 'Unknown';
+        const pageCount = book.pageCount || 'Unknown';
+        const bookId = book.id || book.googleBooksId;
+
+        const isTracked = trackedBooks.some(b => b.id === bookId);
+        const authorList = book.authors || (book.author ? [book.author] : ['Unknown']);
+
+        return `
+          <div class="book-card">
+            ${cover ? `<img src="${cover}" alt="${title}" class="book-cover">` : ''}
+            <div class="book-info">
+              <h3 class="book-title">${title}</h3>
+              <p class="book-author">by ${authors}</p>
+              <p class="book-description">${description}</p>
+              <p class="book-meta">Published: ${publishedDate} • ${pageCount} pages</p>
+              <div class="book-actions">
+                <button class="btn-secondary" onclick='trackBook(${JSON.stringify({
+                  id: bookId,
+                  title: title,
+                  authors: authorList,
+                  cover: cover,
+                  publishedDate: publishedDate
+                })})' ${isTracked ? 'disabled' : ''}>
+                  ${isTracked ? '✓ Tracked' : '⭐ Track Book'}
+                </button>
+                ${authorList.map(author => `
+                  <button class="btn-secondary" onclick='trackAuthor("${author}")'>
+                    ✍️ Track ${author.split(' ').pop()}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      resultsDiv.innerHTML = booksHTML;
+    }
+
+    function trackBook(book) {
+      if (!trackedBooks.some(b => b.id === book.id)) {
+        trackedBooks.push(book);
+        localStorage.setItem('trackedBooks', JSON.stringify(trackedBooks));
+        updateTrackedCount();
+        searchBooks(); // Refresh to update button states
+        alert(`✓ Now tracking: ${book.title}`);
+      }
+    }
+
+    function trackAuthor(authorName) {
+      if (!trackedAuthors.includes(authorName)) {
+        trackedAuthors.push(authorName);
+        localStorage.setItem('trackedAuthors', JSON.stringify(trackedAuthors));
+        updateTrackedCount();
+        alert(`✓ Now tracking all books by: ${authorName}`);
+      } else {
+        alert(`Already tracking: ${authorName}`);
+      }
+    }
+
+    function untrackBook(bookId) {
+      trackedBooks = trackedBooks.filter(b => b.id !== bookId);
+      localStorage.setItem('trackedBooks', JSON.stringify(trackedBooks));
+      updateTrackedCount();
+      renderTrackedBooks();
+    }
+
+    function untrackAuthor(authorName) {
+      trackedAuthors = trackedAuthors.filter(a => a !== authorName);
+      localStorage.setItem('trackedAuthors', JSON.stringify(trackedAuthors));
+      updateTrackedCount();
+      renderTrackedBooks();
+    }
+
+    function updateTrackedCount() {
+      const total = trackedBooks.length + trackedAuthors.length;
+      document.getElementById('trackedCount').textContent = total;
+    }
+
+    function renderTrackedBooks() {
+      const listDiv = document.getElementById('trackedList');
+      
+      if (trackedBooks.length === 0 && trackedAuthors.length === 0) {
+        listDiv.innerHTML = '<div class="no-results">No tracked books or authors yet. Search for books to start tracking!</div>';
+        return;
+      }
+
+      let html = '';
+
+      if (trackedAuthors.length > 0) {
+        html += '<h3 style="color: #6b4423; margin-bottom: 15px;">Tracked Authors</h3>';
+        trackedAuthors.forEach(author => {
+          html += `
+            <div class="tracked-item">
+              <div>
+                <strong style="font-size: 1.2rem;">✍️ ${author}</strong>
+                <p style="color: #8b5a2b; font-size: 0.9rem; margin-top: 5px;">All books by this author</p>
+              </div>
+              <button class="btn-secondary" onclick='untrackAuthor("${author}")'>Remove</button>
+            </div>
+          `;
+        });
+      }
+
+      if (trackedBooks.length > 0) {
+        html += '<h3 style="color: #6b4423; margin: 30px 0 15px 0;">Tracked Books</h3>';
+        trackedBooks.forEach(book => {
+          html += `
+            <div class="tracked-item">
+              <div>
+                <strong style="font-size: 1.2rem;">📚 ${book.title}</strong>
+                <p style="color: #8b5a2b; font-size: 0.9rem; margin-top: 5px;">by ${book.authors.join(', ')}</p>
+              </div>
+              <button class="btn-secondary" onclick='untrackBook("${book.id}")'>Remove</button>
+            </div>
+          `;
+        });
+      }
+
+      listDiv.innerHTML = html;
+    }
+
+    function renderCalendar() {
+      const daysDiv = document.getElementById('calendarDays');
+      const monthHeader = document.getElementById('calendarMonth');
+      
+      const monthNames = ["January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"];
+      
+      monthHeader.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+      let html = '';
+
+      // Empty cells for days before month starts
+      for (let i = 0; i < firstDay; i++) {
+        html += '<div class="day-cell"></div>';
+      }
+
+      // Days of the month
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const releases = trackedBooks.filter(book => book.publishedDate && book.publishedDate.startsWith(dateStr));
+        
+        const hasRelease = releases.length > 0;
+        
+        html += `
+          <div class="day-cell ${hasRelease ? 'has-release' : ''}">
+            <div>${day}</div>
+            ${releases.map(book => `
+              <span class="release-badge" title="${book.title}">${book.title.substring(0, 15)}...</span>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      daysDiv.innerHTML = html;
+    }
+
+    function changeMonth(delta) {
+      currentMonth += delta;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      } else if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      }
+      renderCalendar();
+    }
   </script>
 </body>
 </html>
