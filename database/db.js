@@ -1,9 +1,33 @@
 const { Pool } = require('pg');
 
-// PostgreSQL connection pool
+// Debug: Log database configuration
+const dbUrl = process.env.DATABASE_URL;
+if (!dbUrl) {
+  console.error('❌ ERROR: DATABASE_URL environment variable is not set!');
+  console.error('Please add DATABASE_URL in Render Environment settings');
+  process.exit(1);
+}
+
+console.log('📊 Attempting to connect to database...');
+console.log('   URL starts with:', dbUrl.substring(0, 25) + '...');
+console.log('   NODE_ENV:', process.env.NODE_ENV);
+
+// Try to parse the URL to see what we're connecting to
+try {
+  const url = new URL(dbUrl);
+  console.log('   Host:', url.hostname);
+  console.log('   Port:', url.port || '5432');
+  console.log('   Database:', url.pathname.substring(1));
+} catch (e) {
+  console.error('   ⚠️  Could not parse DATABASE_URL:', e.message);
+}
+
+// PostgreSQL connection pool with increased timeout
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  connectionString: dbUrl,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  connectionTimeoutMillis: 10000, // 10 seconds
+  idleTimeoutMillis: 30000
 });
 
 // Test connection
