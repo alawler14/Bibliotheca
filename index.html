@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bibliotheca - Book Release Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      background: linear-gradient(135deg, #faf8f3 0%, #f5f0e8 50%, #faf8f3 100%);
+      min-height: 100vh;
+      color: #2d1810;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .logo-container {
+      display: inline-flex;
+      align-items: center;
+      gap: 20px;
+      padding: 20px 40px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 60px;
+      border: 2px solid rgba(139, 90, 43, 0.2);
+      box-shadow: 0 4px 20px rgba(139, 90, 43, 0.1);
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      background: linear-gradient(135deg, #8b5a2b 0%, #6b4423 50%, #8b5a2b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-variant: small-caps;
+      margin: 0;
+    }
+
+    .tagline {
+      font-size: 1.2rem;
+      color: #6b4423;
+      font-style: italic;
+      letter-spacing: 0.1em;
+    }
+
+    .user-info {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      align-items: center;
+      margin-top: 15px;
+    }
+
+    .user-email {
+      color: #8b5a2b;
+      font-size: 1rem;
+    }
+
+    .logout-btn {
+      padding: 8px 20px;
+      background: rgba(139, 90, 43, 0.15);
+      border: 1px solid rgba(139, 90, 43, 0.3);
+      border-radius: 20px;
+      color: #6b4423;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .logout-btn:hover {
+      background: rgba(139, 90, 43, 0.25);
+    }
+
+    .nav-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      padding: 14px 32px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 2px solid rgba(139, 90, 43, 0.2);
+      border-radius: 30px;
+      color: #8b5a2b;
+      font-size: 1.1rem;
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: 0.05em;
+      transition: all 0.3s ease;
+    }
+
+    .nav-btn:hover {
+      background: rgba(139, 90, 43, 0.1);
+      border-color: rgba(139, 90, 43, 0.35);
+    }
+
+    .nav-btn.active {
+      background: rgba(139, 90, 43, 0.15);
+      border-color: rgba(139, 90, 43, 0.5);
+      color: #6b4423;
+      box-shadow: 0 2px 10px rgba(139, 90, 43, 0.15);
+    }
+
+    .auth-container {
+      max-width: 500px;
+      margin: 100px auto;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 40px;
+      border-radius: 20px;
+      border: 2px solid rgba(139, 90, 43, 0.2);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .auth-title {
+      font-size: 2.5rem;
+      text-align: center;
+      color: #6b4423;
+      margin-bottom: 30px;
+      font-variant: small-caps;
+      font-weight: 400;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      color: #6b4423;
+      font-size: 1.1rem;
+      letter-spacing: 0.05em;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 1rem;
+      border: 2px solid rgba(139, 90, 43, 0.25);
+      border-radius: 10px;
+      font-family: inherit;
+      background: rgba(255, 255, 255, 0.9);
+      color: #2d1810;
+      outline: none;
+    }
+
+    .form-input:focus {
+      border-color: rgba(139, 90, 43, 0.5);
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 15px;
+      font-size: 1.2rem;
+      background: rgba(139, 90, 43, 0.9);
+      color: #faf8f3;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: 0.05em;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: rgba(107, 68, 35, 0.9);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:disabled {
+      background: rgba(139, 90, 43, 0.5);
+      cursor: not-allowed;
+    }
+
+    .auth-switch {
+      text-align: center;
+      margin-top: 20px;
+      color: #8b5a2b;
+      font-size: 1rem;
+    }
+
+    .auth-link {
+      color: #6b4423;
+      cursor: pointer;
+      text-decoration: underline;
+      font-weight: 600;
+    }
+
+    .auth-link:hover {
+      color: #8b5a2b;
+    }
+
+    .error-message {
+      background: rgba(220, 100, 50, 0.12);
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 0.95rem;
+      color: #a04020;
+      border: 1px solid rgba(220, 100, 50, 0.3);
+    }
+
+    .success-message {
+      background: rgba(100, 180, 100, 0.12);
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 0.95rem;
+      color: #2d6b2d;
+      border: 1px solid rgba(100, 180, 100, 0.3);
+    }
+
+    .search-section {
+      background: rgba(255, 255, 255, 0.7);
+      padding: 30px;
+      border-radius: 20px;
+      border: 2px solid rgba(139, 90, 43, 0.2);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      margin-bottom: 30px;
+    }
+
+    .rate-limit-badge {
+      background: rgba(139, 90, 43, 0.08);
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      color: #6b4423;
+      border: 1px solid rgba(139, 90, 43, 0.2);
+      text-align: center;
+    }
+
+    .search-type-toggle {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      justify-content: center;
+    }
+
+    .toggle-btn {
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 2px solid rgba(139, 90, 43, 0.2);
+      border-radius: 20px;
+      color: #8b5a2b;
+      font-size: 0.95rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.3s ease;
+    }
+
+    .toggle-btn.active {
+      background: rgba(139, 90, 43, 0.2);
+      border-color: rgba(139, 90, 43, 0.5);
+      color: #6b4423;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 15px 20px;
+      font-size: 1.1rem;
+      border: 2px solid rgba(139, 90, 43, 0.25);
+      border-radius: 12px;
+      font-family: inherit;
+      background: rgba(255, 255, 255, 0.8);
+      color: #2d1810;
+      outline: none;
+    }
+
+    .btn-secondary {
+      padding: 8px 16px;
+      background: rgba(139, 90, 43, 0.15);
+      border: 1px solid rgba(139, 90, 43, 0.3);
+      border-radius: 8px;
+      color: #6b4423;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: rgba(139, 90, 43, 0.25);
+    }
+
+    .btn-secondary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .results {
+      display: grid;
+      gap: 15px;
+    }
+
+    .book-card {
+      background: rgba(255, 255, 255, 0.7);
+      padding: 20px;
+      border-radius: 12px;
+      border: 2px solid rgba(139, 90, 43, 0.2);
+      display: flex;
+      gap: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .book-card:hover {
+      border-color: rgba(139, 90, 43, 0.5);
+      box-shadow: 0 4px 25px rgba(139, 90, 43, 0.15);
+    }
+
+    .book-cover {
+      width: 120px;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 2px solid rgba(139, 90, 43, 0.25);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .book-info {
+      flex: 1;
+    }
+
+    .book-title {
+      font-size: 1.6rem;
+      margin-bottom: 8px;
+      color: #2d1810;
+      font-weight: 500;
+    }
+
+    .book-author {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+      color: #8b5a2b;
+      font-style: italic;
+    }
+
+    .book-description {
+      font-size: 0.95rem;
+      color: #5a4030;
+      line-height: 1.6;
+      margin-bottom: 15px;
+    }
+
+    .book-meta {
+      font-size: 0.85rem;
+      color: #a08060;
+      margin-bottom: 15px;
+    }
+
+    .book-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      font-size: 1.2rem;
+      color: #8b5a2b;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(139, 90, 43, 0.3);
+      border-top-color: #8b5a2b;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 10px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Year Calendar Styles */
+    .year-calendar {
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 20px;
+      padding: 30px;
+      border: 2px solid rgba(139, 90, 43, 0.15);
+    }
+
+    .year-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .year-title {
+      font-size: 2.5rem;
+      color: #6b4423;
+      font-variant: small-caps;
+      font-weight: 400;
+    }
+
+    .months-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+    }
+
+    .month-card {
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 15px;
+      padding: 20px;
+      border: 2px solid rgba(139, 90, 43, 0.2);
+    }
+
+    .month-name {
+      font-size: 1.5rem;
+      color: #6b4423;
+      text-align: center;
+      margin-bottom: 15px;
+      font-variant: small-caps;
+      font-weight: 500;
+    }
+
+    .release-item {
+      background: rgba(139, 90, 43, 0.08);
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      border-left: 4px solid rgba(139, 90, 43, 0.6);
+    }
+
+    .release-date {
+      font-size: 0.85rem;
+      color: #8b5a2b;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .release-title {
+      font-size: 1.1rem;
+      color: #2d1810;
+      margin-bottom: 2px;
+    }
+
+    .release-author {
+      font-size: 0.9rem;
+      color: #6b4423;
+      font-style: italic;
+    }
+
+    .no-releases {
+      text-align: center;
+      color: #a08060;
+      font-style: italic;
+      padding: 20px;
+    }
+
+    .tracked-list {
+      display: grid;
+      gap: 15px;
+    }
+
+    .tracked-item {
+      background: rgba(255, 255, 255, 0.7);
+      padding: 15px 20px;
+      border-radius: 12px;
+      border: 2px solid rgba(139, 90, 43, 0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script>
+    const API_BASE_URL = 'https://bibliotheca-6upz.onrender.com/api';
+    
+    // App State
+    let currentView = 'search';
+    let currentUser = null;
+    let authToken = null;
+    let searchType = 'title';
+    let searchesRemaining = null;
+    let trackedBooks = [];
+    let trackedAuthors = [];
+    let currentYear = new Date().getFullYear();
+
+    // Initialize app
+    function init() {
+      // Check if user is logged in
+      authToken = localStorage.getItem('authToken');
+      const userStr = localStorage.getItem('currentUser');
+      if (authToken && userStr) {
+        currentUser = JSON.parse(userStr);
+        loadTrackedItems();
+        render();
+        checkRateLimit();
+      } else {
+        renderAuthPage('login');
+      }
+    }
+
+    // Auth Functions
+    async function login(email, password) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Login failed');
+        }
+
+        authToken = data.token;
+        currentUser = data.user;
+        localStorage.setItem('authToken', authToken);
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+        await loadTrackedItems();
+        render();
+        checkRateLimit();
+      } catch (error) {
+        throw error;
+      }
+    }
+
+    async function register(email, password, name) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, name })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Registration failed');
+        }
+
+        authToken = data.token;
+        currentUser = data.user;
+        localStorage.setItem('authToken', authToken);
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+        render();
+        checkRateLimit();
+      } catch (error) {
+        throw error;
+      }
+    }
+
+    function logout() {
+      authToken = null;
+      currentUser = null;
+      trackedBooks = [];
+      trackedAuthors = [];
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('currentUser');
+      renderAuthPage('login');
+    }
+
+    // API Functions
+    async function checkRateLimit() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/rate-limit-status`);
+        if (response.ok) {
+          const data = await response.json();
+          searchesRemaining = data.remaining;
+          updateRateLimitBadge();
+        }
+      } catch (error) {
+        console.error('Error checking rate limit:', error);
+      }
+    }
+
+    async function searchBooks(query) {
+      if (!query.trim()) {
+        showError('Please enter a search term');
+        return;
+      }
+
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = '<div class="loading"><span class="spinner"></span>Searching...</div>';
+
+      try {
+        const searchQuery = searchType === 'author' ? `inauthor:${query}` : query;
+        const response = await fetch(
+          `${API_BASE_URL}/books/search?query=${encodeURIComponent(searchQuery)}&maxResults=20`
+        );
+
+        if (response.status === 429) {
+          throw new Error('Daily search limit exceeded');
+        }
+
+        if (!response.ok) {
+          throw new Error('Search failed');
+        }
+
+        const data = await response.json();
+        const remaining = response.headers.get('X-Searches-Remaining');
+        if (remaining) {
+          searchesRemaining = parseInt(remaining);
+          updateRateLimitBadge();
+        }
+
+        displaySearchResults(data.books || []);
+      } catch (error) {
+        showError(error.message);
+        resultsDiv.innerHTML = '';
+      }
+    }
+
+    async function trackBook(book) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/tracking/books`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          },
+          body: JSON.stringify({
+            googleBooksId: book.googleBooksId,
+            title: book.title,
+            authors: book.authors,
+            cover: book.cover,
+            publishedDate: book.publishedDate,
+            releaseDate: book.releaseDate,
+            series: book.series
+          })
+        });
+
+        if (!response.ok) throw new Error('Failed to track book');
+
+        await loadTrackedItems();
+        showSuccess(`✓ Now tracking: ${book.title}`);
+      } catch (error) {
+        showError(error.message);
+      }
+    }
+
+    async function trackAuthor(authorName) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/tracking/authors`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          },
+          body: JSON.stringify({ authorName })
+        });
+
+        if (!response.ok) throw new Error('Failed to track author');
+
+        await loadTrackedItems();
+        showSuccess(`✓ Now tracking: ${authorName}`);
+      } catch (error) {
+        showError(error.message);
+      }
+    }
+
+    async function loadTrackedItems() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/tracking/all`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) throw new Error('Failed to load tracked items');
+
+        const data = await response.json();
+        trackedBooks = data.books || [];
+        trackedAuthors = data.authors || [];
+      } catch (error) {
+        console.error('Error loading tracked items:', error);
+      }
+    }
+
+    async function untrackBook(bookId) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/tracking/books/${bookId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) throw new Error('Failed to untrack book');
+
+        await loadTrackedItems();
+        renderTrackedView();
+      } catch (error) {
+        showError(error.message);
+      }
+    }
+
+    async function untrackAuthor(authorId) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/tracking/authors/${authorId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) throw new Error('Failed to untrack author');
+
+        await loadTrackedItems();
+        renderTrackedView();
+      } catch (error) {
+        showError(error.message);
+      }
+    }
+
+    // Render Functions
+    function render() {
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        <div class="container">
+          ${renderHeader()}
+          ${renderNav()}
+          ${renderContent()}
+        </div>
+      `;
+    }
+
+    function renderHeader() {
+      return `
+        <header class="header">
+          <div class="logo-container">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#8b5a2b" stroke-width="1.5">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+            <h1>Bibliotheca</h1>
+          </div>
+          <p class="tagline">Your Personal Literary Chronicle</p>
+          <div class="user-info">
+            <span class="user-email">👤 ${currentUser.email}</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+          </div>
+        </header>
+      `;
+    }
+
+    function renderNav() {
+      const trackedCount = trackedBooks.length + trackedAuthors.length;
+      return `
+        <div class="nav-buttons">
+          <button class="nav-btn ${currentView === 'search' ? 'active' : ''}" onclick="changeView('search')">
+            🔍 Search
+          </button>
+          <button class="nav-btn ${currentView === 'calendar' ? 'active' : ''}" onclick="changeView('calendar')">
+            📅 Calendar
+          </button>
+          <button class="nav-btn ${currentView === 'tracked' ? 'active' : ''}" onclick="changeView('tracked')">
+            ⭐ My Books (${trackedCount})
+          </button>
+        </div>
+      `;
+    }
+
+    function renderContent() {
+      if (currentView === 'search') return renderSearchView();
+      if (currentView === 'calendar') return renderCalendarView();
+      if (currentView === 'tracked') return renderTrackedView();
+    }
+
+    function renderSearchView() {
+      return `
+        <div class="search-section">
+          <h2 style="margin-bottom: 20px; color: #6b4423; font-weight: 400; letter-spacing: 0.08em; font-variant: small-caps;">Search for Books</h2>
+          
+          <div id="rateLimitBadge" class="rate-limit-badge">
+            ${searchesRemaining !== null ? `${searchesRemaining} searches remaining today` : 'Checking...'}
+          </div>
+
+          <div class="search-type-toggle">
+            <button class="toggle-btn ${searchType === 'title' ? 'active' : ''}" onclick="setSearchType('title')">
+              📚 Search by Title
+            </button>
+            <button class="toggle-btn ${searchType === 'author' ? 'active' : ''}" onclick="setSearchType('author')">
+              ✍️ Search by Author
+            </button>
+          </div>
+          
+          <div class="search-box">
+            <input 
+              type="text" 
+              id="searchInput" 
+              placeholder="${searchType === 'title' ? 'Enter book title...' : 'Enter author name...'}"
+              onkeypress="if(event.key==='Enter') searchBooks(document.getElementById('searchInput').value)"
+            >
+            <button class="btn-primary" onclick="searchBooks(document.getElementById('searchInput').value)" style="width: auto; padding: 15px 30px;">
+              Search
+            </button>
+          </div>
+
+          <div id="errorMessage" style="display: none;"></div>
+          <div id="results"></div>
+        </div>
+      `;
+    }
+
+    function renderCalendarView() {
+      const months = ['January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'];
+      
+      // Group tracked books by month
+      const releasesByMonth = {};
+      trackedBooks.forEach(book => {
+        if (book.release_date) {
+          const date = new Date(book.release_date);
+          const monthKey = date.getMonth();
+          if (!releasesByMonth[monthKey]) releasesByMonth[monthKey] = [];
+          releasesByMonth[monthKey].push({
+            ...book,
+            date: date
+          });
+        }
+      });
+
+      let monthsHTML = '';
+      for (let i = 0; i < 12; i++) {
+        const releases = releasesByMonth[i] || [];
+        monthsHTML += `
+          <div class="month-card">
+            <div class="month-name">${months[i]}</div>
+            ${releases.length > 0 
+              ? releases.map(book => `
+                  <div class="release-item">
+                    <div class="release-date">${book.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                    <div class="release-title">${book.title}</div>
+                    <div class="release-author">by ${book.authors.join(', ')}</div>
+                  </div>
+                `).join('')
+              : '<div class="no-releases">No releases this month</div>'
+            }
+          </div>
+        `;
+      }
+
+      return `
+        <div class="year-calendar">
+          <div class="year-header">
+            <h2 class="year-title">${currentYear} Release Calendar</h2>
+          </div>
+          <div class="months-grid">
+            ${monthsHTML}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTrackedView() {
+      const hasItems = trackedBooks.length > 0 || trackedAuthors.length > 0;
+
+      return `
+        <div class="search-section">
+          <h2 style="margin-bottom: 20px; color: #6b4423; font-weight: 400; letter-spacing: 0.08em; font-variant: small-caps;">
+            My Tracked Books & Authors
+          </h2>
+          
+          ${!hasItems ? `
+            <div class="no-releases" style="padding: 60px 20px;">
+              <p style="font-size: 1.3rem; margin-bottom: 15px;">No tracked items yet</p>
+              <p style="font-size: 1rem;">Search for books and click "Track" to start building your collection!</p>
+            </div>
+          ` : `
+            ${trackedAuthors.length > 0 ? `
+              <h3 style="color: #6b4423; margin-bottom: 15px; font-weight: 400;">Tracked Authors</h3>
+              <div class="tracked-list">
+                ${trackedAuthors.map(author => `
+                  <div class="tracked-item">
+                    <div>
+                      <strong style="font-size: 1.2rem;">✍️ ${author.name}</strong>
+                      <p style="color: #8b5a2b; font-size: 0.9rem; margin-top: 5px;">All books by this author</p>
+                    </div>
+                    <button class="btn-secondary" onclick="untrackAuthor(${author.id})">Remove</button>
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+
+            ${trackedBooks.length > 0 ? `
+              <h3 style="color: #6b4423; margin: 30px 0 15px 0; font-weight: 400;">Tracked Books</h3>
+              <div class="tracked-list">
+                ${trackedBooks.map(book => `
+                  <div class="tracked-item">
+                    <div>
+                      <strong style="font-size: 1.2rem;">📚 ${book.title}</strong>
+                      <p style="color: #8b5a2b; font-size: 0.9rem; margin-top: 5px;">
+                        by ${book.authors.join(', ')}
+                        ${book.release_date ? ` • Release: ${new Date(book.release_date).toLocaleDateString()}` : ''}
+                      </p>
+                    </div>
+                    <button class="btn-secondary" onclick="untrackBook(${book.id})">Remove</button>
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+          `}
+        </div>
+      `;
+    }
+
+    function displaySearchResults(books) {
+      const resultsDiv = document.getElementById('results');
+      
+      if (books.length === 0) {
+        resultsDiv.innerHTML = '<div class="loading">No results found. Try a different search.</div>';
+        return;
+      }
+
+      resultsDiv.innerHTML = `
+        <div class="results">
+          ${books.map(book => {
+            const isTracked = trackedBooks.some(b => b.google_books_id === book.googleBooksId);
+            return `
+              <div class="book-card">
+                ${book.cover ? `<img src="${book.cover}" alt="${book.title}" class="book-cover">` : ''}
+                <div class="book-info">
+                  <h3 class="book-title">${book.title}</h3>
+                  <p class="book-author">by ${book.author}</p>
+                  <p class="book-description">${book.description}</p>
+                  <p class="book-meta">Published: ${book.publishedDate || 'Unknown'} • ${book.pageCount || 'Unknown'} pages</p>
+                  <div class="book-actions">
+                    <button class="btn-secondary" onclick='trackBook(${JSON.stringify(book).replace(/'/g, "&apos;")})' ${isTracked ? 'disabled' : ''}>
+                      ${isTracked ? '✓ Tracked' : '⭐ Track Book'}
+                    </button>
+                    ${book.authors.map(author => `
+                      <button class="btn-secondary" onclick='trackAuthor("${author}")'>
+                        ✍️ Track ${author.split(' ').pop()}
+                      </button>
+                    `).join('')}
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    function renderAuthPage(mode) {
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        <div class="auth-container">
+          <h1 class="auth-title">${mode === 'login' ? 'Welcome Back' : 'Create Account'}</h1>
+          
+          <div id="authError" style="display: none;"></div>
+          <div id="authSuccess" style="display: none;"></div>
+
+          <form id="authForm" onsubmit="handleAuth(event, '${mode}')">
+            ${mode === 'register' ? `
+              <div class="form-group">
+                <label class="form-label">Name</label>
+                <input type="text" id="name" class="form-input" required>
+              </div>
+            ` : ''}
+            
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" id="email" class="form-input" required>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <input type="password" id="password" class="form-input" minlength="6" required>
+            </div>
+
+            <button type="submit" class="btn-primary" id="authSubmit">
+              ${mode === 'login' ? 'Login' : 'Register'}
+            </button>
+          </form>
+
+          <div class="auth-switch">
+            ${mode === 'login' 
+              ? 'Don\'t have an account? <span class="auth-link" onclick="renderAuthPage(\'register\')">Register</span>'
+              : 'Already have an account? <span class="auth-link" onclick="renderAuthPage(\'login\')">Login</span>'
+            }
+          </div>
+        </div>
+      `;
+    }
+
+    async function handleAuth(event, mode) {
+      event.preventDefault();
+      
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const name = mode === 'register' ? document.getElementById('name').value : null;
+      const submitBtn = document.getElementById('authSubmit');
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = mode === 'login' ? 'Logging in...' : 'Creating account...';
+
+      try {
+        if (mode === 'login') {
+          await login(email, password);
+        } else {
+          await register(email, password, name);
+        }
+      } catch (error) {
+        showAuthError(error.message);
+        submitBtn.disabled = false;
+        submitBtn.textContent = mode === 'login' ? 'Login' : 'Register';
+      }
+    }
+
+    // Utility Functions
+    function changeView(view) {
+      currentView = view;
+      render();
+      if (view === 'search') {
+        document.getElementById('searchInput')?.focus();
+      }
+    }
+
+    function setSearchType(type) {
+      searchType = type;
+      render();
+    }
+
+    function updateRateLimitBadge() {
+      const badge = document.getElementById('rateLimitBadge');
+      if (badge && searchesRemaining !== null) {
+        badge.textContent = searchesRemaining > 0 
+          ? `${searchesRemaining} searches remaining today`
+          : '⚠️ Daily limit reached - try again tomorrow';
+        badge.style.background = searchesRemaining > 0 
+          ? 'rgba(139, 90, 43, 0.08)'
+          : 'rgba(220, 100, 50, 0.12)';
+      }
+    }
+
+    function showError(message) {
+      const errorDiv = document.getElementById('errorMessage');
+      if (errorDiv) {
+        errorDiv.className = 'error-message';
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+        setTimeout(() => errorDiv.style.display = 'none', 5000);
+      }
+    }
+
+    function showSuccess(message) {
+      const errorDiv = document.getElementById('errorMessage');
+      if (errorDiv) {
+        errorDiv.className = 'success-message';
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+        setTimeout(() => errorDiv.style.display = 'none', 3000);
+      }
+    }
+
+    function showAuthError(message) {
+      const errorDiv = document.getElementById('authError');
+      errorDiv.className = 'error-message';
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+    }
+
+    // Initialize app on page load
+    init();
+  </script>
+</body>
+</html>
