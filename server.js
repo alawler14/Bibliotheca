@@ -503,6 +503,45 @@ app.get('/api/rate-limit-status', searchLimiter, (req, res) => {
     resetTime: reset ? new Date(parseInt(reset) * 1000).toISOString() : null
   });
 });
+// Update release date for a book
+app.post('/api/books/:bookId/release-date', authenticateToken, async (req, res) => {
+  try {
+    const { bookId } = req.params;
+    const { releaseDate } = req.body;
+
+    if (!releaseDate) {
+      return res.status(400).json({ error: 'Release date required' });
+    }
+
+    // Update the book's release date
+    await db.query(
+      'UPDATE books SET release_date = $1, is_released = $2, updated_at = NOW() WHERE id = $3',
+      [releaseDate, new Date(releaseDate) <= new Date(), bookId]
+    );
+
+    res.json({ success: true, message: 'Release date updated' });
+  } catch (error) {
+    console.error('Error updating release date:', error);
+    res.status(500).json({ error: 'Failed to update release date' });
+  }
+});
+
+// Remove release date
+app.delete('/api/books/:bookId/release-date', authenticateToken, async (req, res) => {
+  try {
+    const { bookId } = req.params;
+
+    await db.query(
+      'UPDATE books SET release_date = NULL, updated_at = NOW() WHERE id = $1',
+      [bookId]
+    );
+
+    res.json({ success: true, message: 'Release date removed' });
+  } catch (error) {
+    console.error('Error removing release date:', error);
+    res.status(500).json({ error: 'Failed to remove release date' });
+  }
+});
 
 // Start server
 async function startServer() {
